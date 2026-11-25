@@ -1,0 +1,222 @@
+<%- include('../partials/header', { title: title }) %>
+<%- include('../partials/navbar', { active: 'docs' }) %>
+<%
+  const localUrl = 'http://localhost:5000/api';
+  const prodUrl = 'https://your-deployed-domain.vercel.app/api';
+  const firstFetch = `fetch('${baseUrl}/posts?limit=3')\n  .then(res => res.json())\n  .then(data => console.log(data))\n  .catch(error => console.error(error));`;
+  const pageFetch = [
+    'const limit = 10;',
+    'const page = 2; // pages start at 1',
+    'const skip = (page - 1) * limit;',
+    '',
+    'fetch(`' + baseUrl + '/posts?limit=${limit}&skip=${skip}`)',
+    '  .then(res => res.json())',
+    '  .then(data => console.log(data.posts));'
+  ].join('\n');
+  const err400 = JSON.stringify({ status: 400, error: 'Bad Request', message: 'limit must be an integer between 1 and 100.' }, null, 2);
+  const err404 = JSON.stringify({ status: 404, error: 'Not Found', message: 'Post with id 9999 not found.' }, null, 2);
+  const err404b = JSON.stringify({ status: 404, error: 'Not Found', message: "Invalid id 'abc'. The id must be a positive whole number." }, null, 2);
+  const err500 = JSON.stringify({ status: 500, error: 'Internal Server Error', message: 'Database connection failed.' }, null, 2);
+%>
+
+<div class="docs-bar">
+  <button type="button" id="docsMenuBtn" class="docs-menu-btn" aria-controls="docsSidebar" aria-expanded="false">
+    <%- include('../partials/icon', { name: 'menu' }) %><span>Documentation menu</span>
+  </button>
+</div>
+
+<div class="docs-overlay" id="docsOverlay" hidden></div>
+
+<div class="docs-layout" id="main">
+  <aside class="docs-sidebar" id="docsSidebar" aria-label="Documentation navigation">
+    <div class="side-top">
+      <strong>Documentation</strong>
+      <button type="button" class="side-close" id="docsClose" aria-label="Close menu"><%- include('../partials/icon', { name: 'close' }) %></button>
+    </div>
+    <nav>
+      <a class="side-link" href="#introduction">Introduction</a>
+      <a class="side-link" href="#getting-started">Getting Started</a>
+      <p class="side-group">Resources</p>
+      <% resources.forEach(function (r) { %>
+        <a class="side-link" href="#<%= r.slug %>"><%= r.title %></a>
+      <% }) %>
+      <p class="side-group">Guides</p>
+      <a class="side-link" href="#pagination">Pagination</a>
+      <a class="side-link" href="#query-parameters">Query Parameters</a>
+      <a class="side-link" href="#response-format">Response Format</a>
+      <a class="side-link" href="#error-handling">Error Handling</a>
+    </nav>
+  </aside>
+
+  <main class="docs-content">
+    <!-- Introduction -->
+    <section class="docs-section" id="introduction" data-section>
+      <h1>MockBase API documentation</h1>
+      <p class="lead">MockBase returns realistic sample data for posts, products, users and recipes. Everything is read-only: use <code>GET</code> requests and you will receive JSON.</p>
+      <ul class="facts">
+        <li><strong>Base URL</strong><code><%= baseUrl %></code></li>
+        <li><strong>HTTP method</strong><code>GET</code></li>
+        <li><strong>Format</strong><code>application/json</code></li>
+        <li><strong>Resources</strong><span>posts, products, users, recipes</span></li>
+      </ul>
+
+      <h2 class="mt">Endpoints overview</h2>
+      <p>These eight endpoints are available. Each one is documented below with a live example.</p>
+      <div class="table-wrap">
+        <table class="dtable">
+          <thead><tr><th>Method</th><th>Endpoint</th><th>Description</th><th>Expected status</th></tr></thead>
+          <tbody>
+            <% resources.forEach(function (r) { %>
+              <tr>
+                <td>GET</td>
+                <td><code>/api/<%= r.slug %></code></td>
+                <td>Retrieve a paginated list of <%= r.slug %></td>
+                <td><code>200 OK</code> or <code>400</code></td>
+              </tr>
+              <tr>
+                <td>GET</td>
+                <td><code>/api/<%= r.slug %>/:id</code></td>
+                <td>Retrieve one <%= r.singular %> by its numeric id</td>
+                <td><code>200 OK</code> or <code>404</code></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Note: invalid or missing ids return 404, invalid <code>limit</code> or <code>skip</code> values return 400.</p>
+    </section>
+
+    <!-- Getting started -->
+    <section class="docs-section" id="getting-started" data-section>
+      <h2>Getting Started</h2>
+      <p>All endpoints start with the same base URL. Use the local one while developing and your own Vercel domain after deployment.</p>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Environment</th><th>Base URL</th></tr></thead>
+          <tbody>
+            <tr><td>Production</td><td><code><%= prodUrl %></code></td></tr>
+            <tr><td>Local development</td><td><code><%= localUrl %></code></td></tr>
+            <tr><td>This page right now</td><td><code><%= baseUrl %></code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Make your first request. This asks for three posts:</p>
+      <%- include('../partials/codeblock', { lang: 'js', label: 'JavaScript', code: firstFetch, copyText: 'Copy Code' }) %>
+      <p>Open the developer console of your browser to see the result, or use the Try It button under any endpoint below.</p>
+    </section>
+
+    <!-- Resources -->
+    <% resources.forEach(function (r) { %>
+      <section class="docs-section" id="<%= r.slug %>" data-section>
+        <h2><%= r.title %></h2>
+        <p><%= r.description %> The collection has its own list and single-record endpoint.</p>
+
+        <details class="fields">
+          <summary>Fields of a <%= r.singular %></summary>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>_id</code></td><td>string</td><td>MongoDB ObjectId</td></tr>
+                <% r.fields.forEach(function (f) { %>
+                  <tr><td><code><%= f[0] %></code></td><td><%= f[1] %></td><td><%= f[2] %></td></tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <%- include('../partials/endpoint', { r: r, kind: 'list' }) %>
+        <%- include('../partials/endpoint', { r: r, kind: 'single' }) %>
+      </section>
+    <% }) %>
+
+    <!-- Pagination -->
+    <section class="docs-section" id="pagination" data-section>
+      <h2>Pagination</h2>
+      <p>Every list endpoint is paginated with <code>limit</code> and <code>skip</code>. For example, <code>GET /api/posts?limit=10&amp;skip=0</code> returns the first ten posts.</p>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Parameter</th><th>Description</th><th>Default</th></tr></thead>
+          <tbody>
+            <tr><td><code>limit</code></td><td>Number of records to return</td><td>10</td></tr>
+            <tr><td><code>skip</code></td><td>Number of records to skip</td><td>0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>To load a page, skip all records of the earlier pages: <code>skip = (page - 1) * limit</code>. The response always contains <code>total</code>, so you know how many pages exist.</p>
+      <%- include('../partials/codeblock', { lang: 'js', label: 'JavaScript', code: pageFetch, copyText: 'Copy Code' }) %>
+      <p>Page 1 is <code>?limit=10&amp;skip=0</code>, page 2 is <code>?limit=10&amp;skip=10</code>, page 3 is <code>?limit=10&amp;skip=20</code>. Pagination works on posts, products, users and recipes.</p>
+    </section>
+
+    <!-- Query parameters -->
+    <section class="docs-section" id="query-parameters" data-section>
+      <h2>Query Parameters</h2>
+      <p>The server validates both parameters and answers with a clear error when a value is not allowed.</p>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Parameter</th><th>Accepted values</th><th>On invalid value</th></tr></thead>
+          <tbody>
+            <tr><td><code>limit</code></td><td>Whole number from 1 to 100</td><td><code>400 Bad Request</code></td></tr>
+            <tr><td><code>skip</code></td><td>Whole number, 0 or greater</td><td><code>400 Bad Request</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>For example, <code>/api/posts?limit=abc</code> or <code>/api/posts?skip=-5</code> returns:</p>
+      <%- include('../partials/codeblock', { lang: 'json', label: '400 response', code: err400, copyText: 'Copy JSON' }) %>
+    </section>
+
+    <!-- Response format -->
+    <section class="docs-section" id="response-format" data-section>
+      <h2>Response Format</h2>
+      <p>List endpoints return an object with <code>total</code>, <code>skip</code>, <code>limit</code> and an array named after the resource. Single-record endpoints return the record itself. The examples below come from the real posts collection.</p>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Endpoint</th><th>Array key</th></tr></thead>
+          <tbody>
+            <% resources.forEach(function (r) { %>
+              <tr><td><code>/api/<%= r.slug %></code></td><td><code><%= r.key %></code></td></tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <h3>List response</h3>
+      <%- include('../partials/codeblock', { lang: 'json', label: 'GET /api/posts', code: samples.posts.list, copyText: 'Copy JSON' }) %>
+      <h3>Single response</h3>
+      <%- include('../partials/codeblock', { lang: 'json', label: 'GET /api/posts/1', code: samples.posts.single, copyText: 'Copy JSON' }) %>
+    </section>
+
+    <!-- Error handling -->
+    <section class="docs-section" id="error-handling" data-section>
+      <h2>Error Handling</h2>
+      <p>Errors use the same JSON shape everywhere: <code>status</code>, <code>error</code> and a human-readable <code>message</code>.</p>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>200 OK</code></td><td>The request succeeded</td></tr>
+            <tr><td><code>400 Bad Request</code></td><td>limit or skip is invalid</td></tr>
+            <tr><td><code>404 Not Found</code></td><td>The id is invalid, the record does not exist, or the route is unknown</td></tr>
+            <tr><td><code>500 Internal Server Error</code></td><td>Database connection failed or an unexpected error happened</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Record not found</h3>
+      <%- include('../partials/codeblock', { lang: 'json', label: '404 response', code: err404, copyText: 'Copy JSON' }) %>
+      <h3>Invalid id</h3>
+      <%- include('../partials/codeblock', { lang: 'json', label: '404 response', code: err404b, copyText: 'Copy JSON' }) %>
+      <h3>Server error</h3>
+      <%- include('../partials/codeblock', { lang: 'json', label: '500 response', code: err500, copyText: 'Copy JSON' }) %>
+      <p>Handle failures in your own code by checking <code>res.ok</code> before reading the data.</p>
+    </section>
+  </main>
+</div>
+
+<datalist id="endpointList">
+  <% resources.forEach(function (r) { %>
+    <option value="<%= baseUrl %>/<%= r.slug %>"></option>
+    <option value="<%= baseUrl %>/<%= r.slug %>/1"></option>
+  <% }) %>
+</datalist>
+
+<%- include('../partials/footer', { scripts: ['docs.js', 'api-tester.js'] }) %>

@@ -1,0 +1,124 @@
+<%- include('../partials/header', { title: title }) %>
+<%- include('../partials/navbar', { active: 'home' }) %>
+
+<main id="main">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <h1>Realistic JSON for the app you are building.</h1>
+        <p class="lead">MockBase is a free, read-only REST API with posts, products, users and recipes. Send a GET request, get clean JSON back. No sign-up, no API key.</p>
+        <div class="btn-row">
+          <a href="/docs" class="btn-brutal btn-brutal-accent">Explore Documentation</a>
+          <a href="#quick-start" class="btn-brutal">Get Started</a>
+        </div>
+        <p class="hero-note">Base URL: <code><%= baseUrl %></code></p>
+      </div>
+
+      <div class="hero-preview">
+        <%- include('../partials/codeblock', {
+          lang: 'js',
+          label: 'JavaScript',
+          copyText: 'Copy Code',
+          code: `fetch('${baseUrl}/posts')\n  .then(res => res.json())\n  .then(data => console.log(data));`
+        }) %>
+        <%- include('../partials/codeblock', {
+          lang: 'json',
+          label: 'Response',
+          copyText: 'Copy JSON',
+          code: heroJson
+        }) %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick start -->
+  <section class="section" id="quick-start">
+    <div class="container">
+      <div class="section-head reveal">
+        <h2>Pick a category</h2>
+        <p>Four collections, each with a list endpoint and a single-record endpoint.</p>
+      </div>
+      <div class="card-grid">
+        <% cards.forEach(function (c) { %>
+          <a class="card api-card reveal" href="/docs#<%= c.slug %>">
+            <span class="card-icon"><%- include('../partials/icon', { name: c.icon }) %></span>
+            <h3><%= c.title %> API</h3>
+            <p><%= c.description %></p>
+            <div class="card-foot">
+              <span class="record-count"><strong data-count="<%= c.count %>"><%= c.count %></strong> records</span>
+              <span class="card-link">Explore API</span>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Statistics -->
+  <section class="section section-tint">
+    <div class="container">
+      <div class="section-head reveal">
+        <h2>Platform statistics</h2>
+        <p>Numbers below are read live from MongoDB when the page loads.</p>
+      </div>
+      <div class="stats">
+        <div class="stat reveal">
+          <%- include('../partials/icon', { name: 'layout' }) %>
+          <strong data-count="<%= cards.length %>"><%= cards.length %></strong>
+          <span>API categories</span>
+        </div>
+        <div class="stat reveal">
+          <%- include('../partials/icon', { name: 'database' }) %>
+          <strong data-count="<%= totalRecords %>"><%= totalRecords %></strong>
+          <span>Total records</span>
+        </div>
+        <div class="stat reveal">
+          <%- include('../partials/icon', { name: 'server' }) %>
+          <strong data-count="<%= endpointCount %>"><%= endpointCount %></strong>
+          <span>Available endpoints</span>
+        </div>
+        <div class="stat reveal">
+          <%- include('../partials/icon', { name: 'activity' }) %>
+          <strong class="db-status <%= dbConnected ? 'ok' : 'down' %>"><span class="dot"></span><%= dbConnected ? 'Connected' : 'Offline' %></strong>
+          <span>Database status</span>
+        </div>
+      </div>
+      <% if (!dbConnected) { %>
+        <p class="notice">The database is not reachable. Check <code>MONGODB_URI</code> in your <code>.env</code> file and run <code>npm run seed</code>.</p>
+      <% } %>
+    </div>
+  </section>
+
+  <!-- Getting started -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <h2>Use it in three steps</h2>
+      </div>
+      <ol class="steps">
+        <li class="step reveal">
+          <span class="step-num">1</span>
+          <h3>Choose an endpoint</h3>
+          <p>Pick a resource such as <code>/api/products</code> or <code>/api/users/1</code>.</p>
+        </li>
+        <li class="step reveal">
+          <span class="step-num">2</span>
+          <h3>Make a GET request</h3>
+          <p>Call it with <code>fetch</code>, curl, Postman or any HTTP client.</p>
+        </li>
+        <li class="step reveal">
+          <span class="step-num">3</span>
+          <h3>Receive JSON data</h3>
+          <p>Lists return <code>total</code>, <code>skip</code>, <code>limit</code> and the records. Single items return the record.</p>
+        </li>
+      </ol>
+      <div class="btn-row center reveal">
+        <a href="/docs#getting-started" class="btn-brutal btn-brutal-accent">Read the guide</a>
+        <a href="/about" class="btn-brutal">How it is built</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('../partials/footer') %>

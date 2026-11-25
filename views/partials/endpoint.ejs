@@ -1,0 +1,92 @@
+<%
+  // Usage: include('endpoint', { r: resource, kind: 'list' | 'single' })
+  // Needs "baseUrl" and "samples" from the docs controller.
+  const isList = kind === 'list';
+  const anchor = r.slug + (isList ? '-all' : '-single');
+  const fullUrl = isList ? `${baseUrl}/${r.slug}` : `${baseUrl}/${r.slug}/:id`;
+  const exampleUrl = isList ? `${baseUrl}/${r.slug}` : `${baseUrl}/${r.slug}/1`;
+  const fetchCode = `fetch('${exampleUrl}')\n  .then(res => res.json())\n  .then(data => console.log(data))\n  .catch(error => console.error(error));`;
+  const sample = isList ? samples[r.slug].list : samples[r.slug].single;
+%>
+<article class="endpoint" id="<%= anchor %>" data-endpoint data-slug="<%= r.slug %>" data-kind="<%= kind %>">
+  <h3 class="endpoint-title">
+    <%= isList ? 'Get all ' + r.slug : 'Get a single ' + r.singular %>
+    <a class="anchor" href="#<%= anchor %>" aria-label="Link to this endpoint"><%- include('icon', { name: 'link' }) %></a>
+  </h3>
+
+  <div class="endpoint-line">
+    <span class="method get">GET</span>
+    <code class="endpoint-url"><%= fullUrl %></code>
+  </div>
+
+  <% if (isList) { %>
+    <p>By default you will get 10 items, use <a href="#pagination">limit and skip</a> to paginate through all items.</p>
+  <% } else { %>
+    <p>Returns one <%= r.singular %> directly (not wrapped in a list). Use the numeric <code>id</code> field, for example <code>1</code>.</p>
+  <% } %>
+
+  <%- include('codeblock', { lang: 'js', label: 'JavaScript', code: fetchCode, copyText: 'Copy Code' }) %>
+
+  <div class="btn-row">
+    <button type="button" class="btn-brutal" data-toggle-output aria-expanded="false">Show Output</button>
+    <button type="button" class="btn-brutal btn-brutal-accent" data-toggle-tester aria-expanded="false">Try It</button>
+  </div>
+
+  <div class="output" hidden>
+    <%- include('codeblock', { lang: 'json', label: 'JSON response', code: sample, copyText: 'Copy JSON' }) %>
+  </div>
+
+  <div class="tester" hidden>
+    <label class="field">
+      <span>Request URL</span>
+      <input type="text" class="t-url" list="endpointList" spellcheck="false" autocomplete="off">
+    </label>
+    <div class="tester-fields">
+      <% if (isList) { %>
+        <label class="field"><span>limit</span><input type="number" class="t-limit" min="1" max="100" value="10" inputmode="numeric"></label>
+        <label class="field"><span>skip</span><input type="number" class="t-skip" min="0" value="0" inputmode="numeric"></label>
+      <% } else { %>
+        <label class="field"><span>id</span><input type="number" class="t-id" min="1" value="1" inputmode="numeric"></label>
+      <% } %>
+      <button type="button" class="btn btn-primary t-send"><span class="t-send-label">Send request</span></button>
+    </div>
+    <div class="tester-result" hidden>
+      <div class="tester-meta">
+        <span class="status-pill t-status"></span>
+        <span class="t-time"></span>
+        <button type="button" class="copy-btn t-copy"><%- include('icon', { name: 'copy' }) %><span>Copy Response</span></button>
+      </div>
+      <pre class="tester-pre"><code class="hl hl-json t-body"></code></pre>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Parameter</th><th>Type</th><th>Description</th><th>Default</th></tr></thead>
+      <tbody>
+        <% if (isList) { %>
+          <tr><td><code>limit</code></td><td>query</td><td>Number of records to return (1 to 100)</td><td>10</td></tr>
+          <tr><td><code>skip</code></td><td>query</td><td>Number of records to skip</td><td>0</td></tr>
+        <% } else { %>
+          <tr><td><code>id</code></td><td>path</td><td>Numeric id of the <%= r.singular %></td><td>required</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Status</th><th>Response</th></tr></thead>
+      <tbody>
+        <% if (isList) { %>
+          <tr><td><code>200 OK</code></td><td><code>{ total, skip, limit, <%= r.key %>: [ ... ] }</code></td></tr>
+          <tr><td><code>400 Bad Request</code></td><td>limit or skip is not a valid whole number</td></tr>
+        <% } else { %>
+          <tr><td><code>200 OK</code></td><td>The <%= r.singular %> object</td></tr>
+          <tr><td><code>404 Not Found</code></td><td>The id is invalid or no <%= r.singular %> has this id</td></tr>
+        <% } %>
+        <tr><td><code>500 Internal Server Error</code></td><td>Database connection failed or unexpected error</td></tr>
+      </tbody>
+    </table>
+  </div>
+</article>

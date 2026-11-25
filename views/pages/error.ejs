@@ -1,0 +1,12 @@
+<%- include('../partials/header', { title: title }) %>
+<%- include('../partials/navbar', { active: '' }) %>
+<main id="main" class="error-page container">
+  <p class="error-code"><%= status %></p>
+  <h1><%= status === 404 ? 'Page not found' : 'Something went wrong' %></h1>
+  <p class="lead"><%= message %></p>
+  <div class="btn-row center">
+    <a href="/" class="btn-brutal">Go home</a>
+    <a href="/docs" class="btn-brutal btn-brutal-accent">Open documentation</a>
+  </div>
+</main>
+<%- include('../partials/footer') %>

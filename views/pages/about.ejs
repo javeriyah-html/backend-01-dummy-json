@@ -1,0 +1,103 @@
+<%- include('../partials/header', { title: title }) %>
+<%- include('../partials/navbar', { active: 'about' }) %>
+
+<main id="main">
+  <section class="page-hero">
+    <div class="container narrow">
+      <h1>About MockBase</h1>
+      <p class="lead">MockBase is a small, honest API platform: real data in a real database, served through a real backend, so you can build and test front-end code without waiting for one.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container two-col">
+      <div class="reveal">
+        <h2>Why it exists</h2>
+        <p>Front-end developers often need believable JSON before a backend is ready. Hard-coded arrays in a script do not behave like a network call, and they hide loading states, errors and pagination.</p>
+        <p>MockBase gives you those behaviours for free. Every response comes from MongoDB through Express, so the requests you write today work the same way against a production API tomorrow.</p>
+      </div>
+      <div class="reveal">
+        <h2>Project objectives</h2>
+        <ul class="check-list">
+          <li><%- include('../partials/icon', { name: 'check' }) %>Offer four ready-to-use data categories: posts, products, users and recipes.</li>
+          <li><%- include('../partials/icon', { name: 'check' }) %>Return consistent, predictable JSON with pagination.</li>
+          <li><%- include('../partials/icon', { name: 'check' }) %>Explain every endpoint with copy-ready examples and live output.</li>
+          <li><%- include('../partials/icon', { name: 'check' }) %>Show a clean full-stack architecture that beginners can read and extend.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-tint">
+    <div class="container">
+      <div class="section-head reveal">
+        <h2>Architecture overview</h2>
+        <p>A request travels from the client to MongoDB and back. Pages take the same route, but end in an EJS template instead of JSON.</p>
+      </div>
+
+      <ol class="flow reveal" aria-label="Request flow">
+        <li class="flow-node"><%- include('../partials/icon', { name: 'globe' }) %><strong>Client</strong><span>Browser, fetch, Postman</span></li>
+        <li class="flow-arrow" aria-hidden="true"><%- include('../partials/icon', { name: 'arrow' }) %></li>
+        <li class="flow-node"><%- include('../partials/icon', { name: 'server' }) %><strong>Express routes</strong><span>/api/* and pages</span></li>
+        <li class="flow-arrow" aria-hidden="true"><%- include('../partials/icon', { name: 'arrow' }) %></li>
+        <li class="flow-node"><%- include('../partials/icon', { name: 'code' }) %><strong>Controllers</strong><span>Validate and query</span></li>
+        <li class="flow-arrow" aria-hidden="true"><%- include('../partials/icon', { name: 'arrow' }) %></li>
+        <li class="flow-node"><%- include('../partials/icon', { name: 'database' }) %><strong>MongoDB Atlas</strong><span>Four collections</span></li>
+      </ol>
+      <p class="flow-caption reveal">Responses go back the same way: controllers return JSON for <code>/api</code> routes, or pass data to an EJS view that the server renders into HTML.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <h2>Technology stack</h2>
+      </div>
+      <div class="tech-grid">
+        <div class="tech reveal"><span class="tech-badge" style="--c:#3c873a">Node</span><div><strong>Node.js</strong><span>JavaScript runtime with ES Modules</span></div></div>
+        <div class="tech reveal"><span class="tech-badge" style="--c:#222b3a">Ex</span><div><strong>Express.js</strong><span>Routing, middleware, API</span></div></div>
+        <div class="tech reveal"><span class="tech-badge" style="--c:#13aa52">DB</span><div><strong>MongoDB Atlas</strong><span>Cloud database, native driver</span></div></div>
+        <div class="tech reveal"><span class="tech-badge" style="--c:#8a6d1e">EJS</span><div><strong>EJS</strong><span>Server-side HTML templates</span></div></div>
+        <div class="tech reveal"><span class="tech-badge" style="--c:#e34f26">H5</span><div><strong>HTML5</strong><span>Semantic page structure</span></div></div>
+        <div class="tech reveal"><span class="tech-badge" style="--c:#1572b6">CSS</span><div><strong>CSS3</strong><span>Grid, flexbox, variables</span></div></div>
+        <div class="tech reveal"><span class="tech-badge" style="--c:#b08900">JS</span><div><strong>Vanilla JavaScript</strong><span>Copy buttons and API tester</span></div></div>
+        <div class="tech reveal"><span class="tech-badge" style="--c:#000000">Vc</span><div><strong>Vercel</strong><span>Serverless deployment</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-tint">
+    <div class="container three-col">
+      <article class="card reveal">
+        <span class="card-icon"><%- include('../partials/icon', { name: 'server' }) %></span>
+        <h3>How the backend works</h3>
+        <p>Each resource has a route file and a controller. The controller reads <code>limit</code> and <code>skip</code>, rejects bad values with a 400, queries MongoDB and returns JSON. One shared error handler turns every failure into a clear response.</p>
+      </article>
+      <article class="card reveal">
+        <span class="card-icon"><%- include('../partials/icon', { name: 'database' }) %></span>
+        <h3>How MongoDB stores the data</h3>
+        <p>Posts, products, users and recipes live in four collections. Each document has MongoDB's own <code>_id</code> plus a numeric <code>id</code> that the single-record endpoints use. A reusable connection module keeps one client open across requests.</p>
+      </article>
+      <article class="card reveal">
+        <span class="card-icon"><%- include('../partials/icon', { name: 'layout' }) %></span>
+        <h3>How EJS renders pages</h3>
+        <p>Express calls <code>res.render()</code> with data such as record counts. EJS fills partials like the navbar and footer, then sends finished HTML. The browser only needs light JavaScript for copy buttons and the tester.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container narrow">
+      <div class="card dev-card reveal">
+        <h2>About the developer</h2>
+        <p>MockBase was designed and built as a full-stack project covering the backend, database, interface design and written documentation. The code is organised into small files with comments so it is easy to read, change and learn from.</p>
+        <div class="btn-row">
+          <a href="/docs" class="btn-brutal btn-brutal-accent">Read the docs</a>
+          <% if (githubUrl) { %><a href="<%= githubUrl %>" class="btn-brutal" target="_blank" rel="noopener noreferrer">View on GitHub</a><% } %>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('../partials/footer') %>

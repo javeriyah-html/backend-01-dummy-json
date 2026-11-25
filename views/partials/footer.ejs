@@ -1,0 +1,44 @@
+<footer class="footer">
+  <div class="container footer-grid">
+    <div class="footer-about">
+      <a href="/" class="brand"><img src="/images/favicon.svg" alt="" width="28" height="28"><span>MockBase</span></a>
+      <p>A free, read-only mock REST API for posts, products, users and recipes. Data is stored in MongoDB and served by Express.</p>
+    </div>
+    <div>
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/docs">Documentation</a></li>
+        <% if (githubUrl) { %><li><a href="<%= githubUrl %>" target="_blank" rel="noopener noreferrer">GitHub</a></li><% } %>
+      </ul>
+    </div>
+    <div>
+      <h4>API categories</h4>
+      <ul>
+        <% resources.forEach(function (r) { %>
+          <li><a href="/docs#<%= r.slug %>"><%= r.title %></a></li>
+        <% }) %>
+      </ul>
+    </div>
+    <div>
+      <h4>Guides</h4>
+      <ul>
+        <li><a href="/docs#getting-started">Getting started</a></li>
+        <li><a href="/docs#pagination">Pagination</a></li>
+        <li><a href="/docs#error-handling">Error handling</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>&copy; <%= year %> MockBase API. Built with Express, EJS and MongoDB.</span>
+    <span>Sample data only. Not for production use.</span>
+  </div>
+</footer>
+
+<script src="/js/main.js" defer></script>
+<% (typeof scripts !== 'undefined' ? scripts : []).forEach(function (file) { %>
+<script src="/js/<%= file %>" defer></script>
+<% }) %>
+</body>
+</html>

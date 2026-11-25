@@ -1,0 +1,12 @@
+<%
+  // Usage: include('codeblock', { lang: 'js' | 'json', label: 'JavaScript', code: '...', copyText: 'Copy Code' })
+  // Syntax highlighting is added in the browser by main.js.
+%><div class="code">
+  <div class="code-head">
+    <span class="code-lang"><%= label %></span>
+    <button type="button" class="copy-btn" data-copy>
+      <%- include('icon', { name: 'copy' }) %><span><%= copyText %></span>
+    </button>
+  </div>
+  <pre><code class="hl hl-<%= lang %>"><%= code %></code></pre>
+</div>
